@@ -68,18 +68,27 @@ end
 
 tile_size = (ARGV[0] || "8").to_i
 out = ARGV[1] || File.expand_path("../templates/sheet_#{tile_size}.png", __dir__)
+gutter = (ARGV[2] || "1").to_i
 
-sheet = tile_size * 4
+# Gutters: each tile slot is padded by `gutter` px of its own clamped edge
+# pixels, so filtered sampling at scaled/subpixel draws never bleeds the
+# neighbouring tile's pixels in. Pair with Tileset.new(gutter: N).
+pitch = tile_size + gutter * 2
+sheet = pitch * 4
 pixels = Array.new(sheet * sheet, CLEAR)
 
 DragonAutotile::Layout::DUAL_GRID_16.each_with_index do |cell, mask|
   tile = build_tile(mask, tile_size)
-  tile_size.times do |y|
-    tile_size.times do |x|
-      pixels[(cell[:row] * tile_size + y) * sheet + (cell[:col] * tile_size + x)] = tile[y * tile_size + x]
+  clamp = ->(v) { v < 0 ? 0 : (v >= tile_size ? tile_size - 1 : v) }
+  (-gutter...(tile_size + gutter)).each do |y|
+    (-gutter...(tile_size + gutter)).each do |x|
+      px = tile[clamp.call(y) * tile_size + clamp.call(x)]
+      sx = cell[:col] * pitch + gutter + x
+      sy = cell[:row] * pitch + gutter + y
+      pixels[sy * sheet + sx] = px
     end
   end
 end
 
 PngWriter.write(out, sheet, sheet, pixels)
-puts "#{out} (#{sheet}x#{sheet}, tile #{tile_size})"
+puts "#{out} (#{sheet}x#{sheet}, tile #{tile_size}, gutter #{gutter})"

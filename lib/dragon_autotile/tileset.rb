@@ -16,9 +16,9 @@ module DragonAutotile
   # in Conjuration, Kernel.tick_count in plain DR) — the tileset stays a pure
   # lookup and never touches time.
   class Tileset
-    attr_reader :paths, :tile_size, :layout, :variants, :fps
+    attr_reader :paths, :tile_size, :layout, :variants, :fps, :gutter
 
-    def initialize(path: nil, paths: nil, tile_size:, layout: nil, variants: 1, fps: nil)
+    def initialize(path: nil, paths: nil, tile_size:, layout: nil, variants: 1, fps: nil, gutter: 0)
       @paths = paths || [path]
       raise ArgumentError, "path: or paths: required" if @paths.compact.empty?
 
@@ -26,6 +26,7 @@ module DragonAutotile
       @layout = Layout.resolve(layout)
       @variants = variants
       @fps = fps
+      @gutter = gutter
     end
 
     def path
@@ -50,10 +51,11 @@ module DragonAutotile
       visual_row = cell[:row] + variant * 4
       flipped_row = @variants * 4 - 1 - visual_row
 
+      pitch = @tile_size + @gutter * 2
       {
         path: path,
-        source_x: cell[:col] * @tile_size,
-        source_y: flipped_row * @tile_size,
+        source_x: cell[:col] * pitch + @gutter,
+        source_y: flipped_row * pitch + @gutter,
         source_w: @tile_size,
         source_h: @tile_size
       }

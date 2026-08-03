@@ -57,6 +57,13 @@ check_eq(frames.path_at(0), "a.png", "cursor 0 is the first frame")
 check_eq(frames.path_at(4), "b.png", "the cursor wraps")
 check_eq(frames.source_rect(3)[:path], "a.png", "source_rect uses the first frame's path; callers swap via path_at")
 
+padded = DragonAutotile::Tileset.new(path: "sprites/walls.png", tile_size: 8, gutter: 1)
+rect = padded.source_rect(0)
+check_eq(rect[:source_x], 1, "gutter insets the first column")
+check_eq(rect[:source_y], 31, "gutter-aware flip: rows pitch by tile + 2*gutter")
+check_eq(padded.source_rect(15)[:source_x], 31, "column 3 lands past three padded slots")
+check_eq(rect[:source_w], 8, "source size stays the bare tile")
+
 # --- position_hash ------------------------------------------------------------
 
 check_eq(DragonAutotile.position_hash(3, 7, 42), DragonAutotile.position_hash(3, 7, 42), "hash is deterministic")
