@@ -111,7 +111,7 @@ module DragonAutotile
       each_dual_cell do |dcol, drow, mask|
         next if skip_empty && mask == 0
 
-        yield draw_cell(dcol, drow, tileset)
+        yield draw_cell(dcol, drow, tileset), dcol, drow
       end
     end
 

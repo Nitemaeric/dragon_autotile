@@ -116,6 +116,10 @@ drawn = []
 grid.each_resolved(tiles) { |d| drawn << d }
 check_eq(drawn.length, 4, "one solid cell resolves its four dual corners, empties skipped")
 
+positions = []
+grid.each_resolved(tiles) { |_draw, dcol, drow| positions << [dcol, drow] }
+check_eq(positions.sort, [[0, 0], [0, 1], [1, 0], [1, 1]], "each_resolved yields the dual position alongside the draw")
+
 top_left = grid.draw_cell(0, 0, tiles)
 check_eq(top_left[:x], -4, "dual cell 0,0 draws half a tile left of the map")
 check_eq(top_left[:y], 28, "and half a tile above the top structure row (y-up)")
