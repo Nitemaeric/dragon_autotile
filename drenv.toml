@@ -1,0 +1,9 @@
+[package]
+name = "dragon_autotile"
+root = "lib"
+entrypoint = "dragon_autotile.rb"
+version = "0.1.0"
+
+# Annotated paint-over templates for the canonical DUAL_GRID_16 layout; drenv
+# copies these to mygame/vendor/dragon_autotile/templates.
+include = ["templates"]
