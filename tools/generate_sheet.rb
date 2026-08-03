@@ -12,9 +12,14 @@
 require_relative "png_writer"
 require_relative "../lib/dragon_autotile/layout"
 
-FILL    = [255, 255, 255, 255]
-OUTLINE = [160, 160, 160, 255]
-CLEAR   = [0, 0, 0, 0]
+FILL  = [255, 255, 255, 255]
+CLEAR = [0, 0, 0, 0]
+
+# Outline value is relative to fill after tinting: 160 reads as a dark rim when
+# walls are lighter than floors, but as a BRIGHT halo when floors are darker
+# than walls. 255 disables the outline (rounded silhouette only).
+outline_value = (ARGV[3] || "160").to_i
+OUTLINE = [outline_value, outline_value, outline_value, 255]
 
 def build_tile(mask, tile_size)
   half = tile_size / 2
