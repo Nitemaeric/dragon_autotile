@@ -33,6 +33,15 @@ README and inline docs carry the API; these are the rules that prevent bugs.
    Artists replace it by painting over `templates/template_16.png`, where each
    cell's guides show its solid quadrants.
 
+7. **Pixel-art games: `scale_quality=0`.** Filtered sampling halos the cutout
+   silhouettes and bleeds sheet neighbours at fractional zoom. The generated
+   gutters (`gutter: 1`) cover the filtered case, but nearest is the correct
+   lowrez look.
+8. **The outline value is palette-relative.** It tints to a fraction of the
+   wall colour: bright definition when floors are darker than walls, shadow
+   when lighter. Regenerate with the generator's last argument (160 bright,
+   80–100 shadow, 255 none) instead of editing pixels.
+
 ## Boundaries
 
 - `edge: :solid` caps the map border (mazes); `:empty` leaves it open.

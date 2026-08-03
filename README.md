@@ -63,6 +63,18 @@ water = DragonAutotile::Tileset.new(paths: ["water_0.png", "water_1.png"], tile_
 frame = water.path_at(clock.idiv(60).idiv(water.fps))
 ```
 
+## Rendering notes
+
+- Pixel-art games want `scale_quality=0` in `game_metadata.txt`. Filtered
+  sampling at fractional zoom halos the tiles' transparent silhouettes and
+  bleeds neighbouring sheet tiles; nearest sampling makes every pixel a real
+  texel. The generated sheets carry 1px gutters (`gutter: 1` on the Tileset)
+  so they also survive filtering if you keep it.
+- The generated sheet's outline value is palette-relative: it tints to a
+  fraction of the wall colour, so `160` reads as bright definition when floors
+  are darker than walls, and as a shadow when walls are darker. Pick it with
+  the generator's last argument — `160` bright, `80`–`100` shadow, `255` none.
+
 ## Scope
 
 v1 is single-terrain dual-grid: walls against floor, per-region skins via
