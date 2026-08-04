@@ -18,6 +18,16 @@ MATERIALS[:smooth] = lambda do |x, y|
   base
 end
 
+# Tomb slabs: one large slab per tile, seamed on the top/left, quiet mottled
+# face with a small diagonal chip. Big features read calm, not busy.
+MATERIALS[:tomb] = lambda do |x, y|
+  return 180 if x == 0 || y == 0
+
+  return 196 if (x == 5 && y == 2) || (x == 6 && y == 3)
+
+  222 + (DragonAutotile.position_hash(x >> 1, y >> 1, 29) % 3) * 6
+end
+
 # Running-bond brick: mortar rows every 4, joints alternating per course.
 MATERIALS[:brick] = lambda do |x, y|
   return 172 if y % 4 == 3
