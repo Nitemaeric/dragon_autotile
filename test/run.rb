@@ -113,6 +113,32 @@ check_eq(grid.dirty?, false, "drain clears the set")
 grid.set(1, 1, :wall)
 check_eq(grid.dirty?, false, "an identical write dirties nothing")
 
+# --- Grid: per-pass solid + dirty feeds (terrain layering) --------------------
+
+terrain = DragonAutotile::Grid.new(w: 3, h: 1)
+terrain.set(0, 0, :ice)
+terrain.set(1, 0, :grass)
+
+ice_or_grass = ->(v) { v == :ice || v == :grass }
+grass_only = ->(v) { v == :grass }
+check_eq(terrain.dual_mask(1, 1, solid: ice_or_grass), 12, "the lower layer counts higher terrain as solid (extends beneath)")
+check_eq(terrain.dual_mask(1, 1, solid: grass_only), 4, "the upper layer counts only itself (its skirt draws over)")
+check_eq(terrain.dual_mask(1, 1), 12, "no override falls back to truthiness")
+
+tiles8 = DragonAutotile::Tileset.new(path: "sprites/t.png", tile_size: 8)
+grass_draws = 0
+terrain.each_resolved(tiles8, solid: grass_only) { |_d, _c, _r| grass_draws += 1 }
+check_eq(grass_draws, 4, "a per-pass predicate resolves only that terrain's dual cells")
+
+feed_grid = DragonAutotile::Grid.new(w: 4, h: 4)
+feed_a = feed_grid.dirty_feed
+feed_b = feed_grid.dirty_feed
+feed_grid.set(1, 1, :wall)
+check_eq(feed_a.drain_dirty.sort, [[1, 1], [1, 2], [2, 1], [2, 2]], "every feed sees the edit")
+check_eq(feed_b.dirty?, true, "draining one feed leaves the others")
+check_eq(feed_b.drain_dirty.length, 4, "each feed drains independently")
+check_eq(feed_grid.drain_dirty.length, 4, "the legacy single-consumer drain still works")
+
 # --- Grid: draw geometry ------------------------------------------------------
 
 tiles = DragonAutotile::Tileset.new(path: "sprites/walls.png", tile_size: 8)
